@@ -8,9 +8,9 @@
 
 <body>
 	<div id="buttons-view"></div>
-	<div id="images">
+	<div id="gifs-appear-here">
     </div>
-    <script type="text/javascript" src="assets/javascript/logic.js"></script>
+
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script type="text/javascript">
         var giphyApiKey = "2pafrnJKqREkwh49kNwUaUmnxYM465cV";
@@ -25,11 +25,14 @@
         }
 
 
-		$("button").on("click", function () {
+		$("button").on("click", function (event) {
+            event.preventDefault();
 
+            $("#gifs-appear-here").empty();
             var val = $(this).attr("data-name");
             console.log(val);
-			var queryURL = "https://api.giphy.com/v1/gifs/random?api_key=" + giphyApiKey + "&tag=" + val + "&limit=10";
+			var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +	val + "&api_key="+ giphyApiKey + "&limit=10";
+
 
 			//
 			$.ajax({
@@ -39,21 +42,59 @@
 
 				//
 				.then(function (response) {
+                    console.log(queryURL);
 
-					//
-					var imageUrl = response.data.image_original_url;
+                    console.log(response);
 
-					//
-					var catImage = $("<img>");
+                    var results = response.data;
 
-					//
-					catImage.attr("src", imageUrl);
-					catImage.attr("alt", "cat image");
+					for (var i = 0; i < results.length; i++) {
 
-					//
-					$("#images").prepend(catImage);
+                        // Creating and storing a div tag
+                        var autoDiv = $("<div>");
+
+                        // Creating a paragraph tag with the result item's rating
+                        var p = $("<p>").text("Rating: " + results[i].rating);
+
+                        // Creating and storing an image tag
+                        var autoImage = $("<img>");
+                        autoImage.addClass("gif");
+                        autoImage.attr("data-state", "still");
+                        // Setting the src attribute of the image to a property pulled off the result item
+                        autoImage.attr("src", results[i].images.fixed_height_still.url);
+                        autoImage.attr("data-animate", results[i].images.fixed_height.url);
+                        autoImage.attr("data-still", results[i].images.fixed_height_still.url);
+
+
+                        // Appending the paragraph and image tag to the animalDiv
+                        autoDiv.append(p);
+                        autoDiv.append(autoImage);
+
+                        // Prependng the animalDiv to the HTML page in the "#gifs-appear-here" div
+                        $("#gifs-appear-here").prepend(autoDiv);
+                    }
+
 				});
+        });
+        
+        $(".gif").on("click", function () {
+            console.log("Click GIF");
+			// The attr jQuery method allows us to get or set the value of any attribute on our HTML element
+			var state = $(this).attr("data-state");
+			
+			// If the clicked image's state is still, update its src attribute to what its data-animate value is.
+			// Then, set the image's data-state to animate
+			// Else set src to the data-still value
+			if (state === "still") {
+				$(this).attr("src", $(this).attr("data-animate"));
+				$(this).attr("data-state", "animate");
+			} else {
+				$(this).attr("src", $(this).attr("data-still"));
+				$(this).attr("data-state", "still");
+			}
 		});
+
+
 	</script>
 </body>
 
