@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>GifTastic</title>
+</head>
+
+<body>
+	<div id="buttons-view"></div>
+	<div id="images">
+    </div>
+    <script type="text/javascript" src="assets/javascript/logic.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript">
+        var giphyApiKey = "2pafrnJKqREkwh49kNwUaUmnxYM465cV";
+        var buttons = ["Lamborghini", "Ferrari", "Mustang", "Porsche", "Pontiac", "Sportage",
+                        "Mini", "Audi", "Jaguar", "Cayenne", "Volvo", "Ford"];
+        
+        for(i=0; i<buttons.length;i++){
+            var a = $("<button>");
+            a.attr("data-name", buttons[i]);
+            a.text(buttons[i]);
+            $("#buttons-view").append(a);
+        }
+
+
+		$("button").on("click", function () {
+
+            var val = $(this).attr("data-name");
+            console.log(val);
+			var queryURL = "https://api.giphy.com/v1/gifs/random?api_key=" + giphyApiKey + "&tag=" + val + "&limit=10";
+
+			//
+			$.ajax({
+				url: queryURL,
+				method: "GET"
+			})
+
+				//
+				.then(function (response) {
+
+					//
+					var imageUrl = response.data.image_original_url;
+
+					//
+					var catImage = $("<img>");
+
+					//
+					catImage.attr("src", imageUrl);
+					catImage.attr("alt", "cat image");
+
+					//
+					$("#images").prepend(catImage);
+				});
+		});
+	</script>
+</body>
+
+</html>
